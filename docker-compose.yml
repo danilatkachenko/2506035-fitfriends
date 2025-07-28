@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: fitfriends_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: fitfriends
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: fitfriends_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
