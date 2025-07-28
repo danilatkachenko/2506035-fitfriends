@@ -1,0 +1,15 @@
+# WebStorm
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+dist/
+.env
+.env.local
+npm-debug.log
+yarn-error.log
