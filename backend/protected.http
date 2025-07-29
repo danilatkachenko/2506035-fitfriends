@@ -1,0 +1,2 @@
+GET http://localhost:3000/users/profile
+Authorization: Bearer <YOUR_TOKEN_HERE>
