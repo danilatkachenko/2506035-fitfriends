@@ -1,7 +1,17 @@
-import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Put,
+  Req,
+  UseGuards,
+  Post,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Убедись, что путь верный
+import { Request } from 'express';
 
 @Controller('users')
 export class UserController {
@@ -14,9 +24,17 @@ export class UserController {
     return result;
   }
 
-  @UseGuards(JwtAuthGuard) // ✅ Используй свой guard
+  @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Req() req) {
+  getProfile(@Req() req: Request) {
     return req.user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('profile')
+  async updateProfile(@Req() req: Request, @Body() dto: UpdateUserDto) {
+    const user = await this.userService.updateUser((req.user as any).id, dto);
+    const { password, ...result } = user;
+    return result;
   }
 }
