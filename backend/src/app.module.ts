@@ -1,22 +1,27 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.POSTGRES_HOST,
-      port: parseInt(process.env.POSTGRES_PORT || '5432'),
-      username: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DB,
-      autoLoadEntities: true,
-      synchronize: true, // для разработки, потом отключим!
+    ConfigModule.forRoot({
+      isGlobal: true, // чтобы ConfigService работал в любом модуле
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService) => ({
+        type: 'postgres',
+        host: config.get<string>('POSTGRES_HOST'),
+        port: parseInt(config.get<string>('POSTGRES_PORT') || '5432'),
+        username: config.get<string>('POSTGRES_USER'),
+        password: config.get<string>('POSTGRES_PASSWORD'),
+        database: config.get<string>('POSTGRES_DB'),
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
+      inject: [ConfigService],
     }),
     UserModule,
     AuthModule,
