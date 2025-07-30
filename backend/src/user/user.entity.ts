@@ -1,11 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { TrainingEntity } from '../training/entities/training.entity';
 
 @Entity('users')
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column()
   email: string;
 
   @Column()
@@ -14,6 +15,9 @@ export class User {
   @Column()
   name: string;
 
-  @Column({ type: 'varchar' })
+  @Column()
   role: 'client' | 'coach';
+
+  @OneToMany(() => TrainingEntity, (training) => training.coach)
+  trainings: TrainingEntity[];
 }

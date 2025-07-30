@@ -1,0 +1,10 @@
+POST http://localhost:3000/trainings
+Authorization: Bearer <JWT_TOKEN_HERE>
+Content-Type: application/json
+
+{
+  "title": "Силовая тренировка",
+  "description": "Качаем ноги",
+  "duration": 60,
+  "price": 1500
+}

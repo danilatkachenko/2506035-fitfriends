@@ -2,8 +2,12 @@ POST http://localhost:3000/users/register
 Content-Type: application/json
 
 {
-  "email": "test@mail.com",
+  "email": "nocoach123@example.com",
   "password": "123456",
-  "name": "Test User",
-  "role": "client"
+  "name": "Coach Max",
+  "role": "client",
+  "certificate": "Certified by FitPro",
+  "description": "Тренирую людей более 5 лет",
+  "location": "Москва",
+  "trainingLevel": "advanced"
 }
