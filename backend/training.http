@@ -1,10 +1,4 @@
-POST http://localhost:3000/trainings
-Authorization: Bearer <JWT_TOKEN_HERE>
+GET http://localhost:3000/trainings
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE5LCJlbWFpbCI6ImNvYWNoMTIzNDVAZXhhbXBsZS5jb20iLCJpYXQiOjE3NTM5NDk0MDYsImV4cCI6MTc1NDU1NDIwNn0.2Oivp8n8zeKC21NuhSCRiIH9We1Hk_R7I9mrhcghFdw
 Content-Type: application/json
 
-{
-  "title": "Силовая тренировка",
-  "description": "Качаем ноги",
-  "duration": 60,
-  "price": 1500
-}
