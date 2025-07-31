@@ -55,4 +55,25 @@ export class TrainingController {
     await this.trainingService.delete(id, req.user.id);
     return { message: 'Удалено' };
   }
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  async updateTraining(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req,
+    @Body() dto: UpdateTrainingDto,
+  ) {
+    const updated = await this.trainingService.updateTraining(
+      id,
+      req.user.id,
+      dto,
+    );
+
+    const { password, ...safeCoach } = updated.coach;
+    const { coach, ...rest } = updated;
+
+    return {
+      ...rest,
+      coach: safeCoach,
+    };
+  }
 }

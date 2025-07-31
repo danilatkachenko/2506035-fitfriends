@@ -1,8 +1,0 @@
-GET http://localhost:3000/users/profile
-Authorization: Bearer <YOUR_TOKEN_HERE>
-PUT http://localhost:3000/users/profile
-Content-Type: application/json
-
-{
-  "name": "Обновлённый Юзер",
-}

@@ -1,4 +1,11 @@
-import { IsOptional, IsString, IsNumber } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsInt,
+  Min,
+  Max,
+  IsNumber,
+} from 'class-validator';
 
 export class UpdateTrainingDto {
   @IsOptional()
@@ -10,14 +17,19 @@ export class UpdateTrainingDto {
   description?: string;
 
   @IsOptional()
-  @IsNumber()
+  @IsInt()
+  @Min(10)
+  @Max(300)
   duration?: number;
 
   @IsOptional()
-  @IsNumber()
+  @IsInt()
+  @Min(0)
+  @Max(1000)
   calories?: number;
 
   @IsOptional()
   @IsNumber()
+  @Min(0)
   price?: number;
 }

@@ -13,7 +13,15 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async findByEmail(email: string): Promise<UserEntity | null> {
+  async findByEmail(email: string, withPassword = false) {
+    if (withPassword) {
+      return this.userRepository
+        .createQueryBuilder('user')
+        .addSelect('user.password')
+        .where('user.email = :email', { email })
+        .getOne();
+    }
+
     return this.userRepository.findOne({ where: { email } });
   }
 

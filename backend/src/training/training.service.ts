@@ -119,4 +119,27 @@ export class TrainingService {
 
     await this.trainingRepo.remove(training);
   }
+  async updateTraining(
+    trainingId: number,
+    coachId: number,
+    dto: UpdateTrainingDto,
+  ) {
+    const training = await this.trainingRepo.findOne({
+      where: { id: trainingId },
+      relations: ['coach'],
+    });
+
+    if (!training) {
+      throw new NotFoundException('Тренировка не найдена');
+    }
+
+    if (training.coach.id !== coachId) {
+      throw new ForbiddenException(
+        'Вы не можете редактировать чужую тренировку',
+      );
+    }
+
+    Object.assign(training, dto);
+    return this.trainingRepo.save(training);
+  }
 }
