@@ -1,9 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TrainingEntity } from './entities/training.entity';
 import { Repository } from 'typeorm';
 import { CreateTrainingDto } from './dto/create-training.dto';
 import { UserEntity } from '../user/user.entity';
+import { FilterTrainingDto } from './dto/filter-training.dto';
+import { UpdateTrainingDto } from './dto/update-training.dto';
 
 @Injectable()
 export class TrainingService {
@@ -51,5 +57,66 @@ export class TrainingService {
         },
       },
     });
+  }
+  async getAll(filters: FilterTrainingDto) {
+    const query = this.trainingRepo
+      .createQueryBuilder('training')
+      .leftJoinAndSelect('training.coach', 'coach');
+
+    if (filters.minPrice !== undefined) {
+      query.andWhere('training.price >= :minPrice', {
+        minPrice: filters.minPrice,
+      });
+    }
+
+    if (filters.maxPrice !== undefined) {
+      query.andWhere('training.price <= :maxPrice', {
+        maxPrice: filters.maxPrice,
+      });
+    }
+
+    if (filters.sort) {
+      query.orderBy(`training.${filters.sort}`, 'ASC');
+    }
+
+    return query.getMany();
+  }
+  async getById(id: number) {
+    const training = await this.trainingRepo.findOne({
+      where: { id },
+      relations: ['coach'],
+    });
+
+    if (!training) {
+      throw new NotFoundException('Тренировка не найдена');
+    }
+
+    const { password, ...coachWithoutPassword } = training.coach;
+    return { ...training, coach: coachWithoutPassword };
+  }
+  async update(id: number, coachId: number, dto: UpdateTrainingDto) {
+    const training = await this.trainingRepo.findOne({
+      where: { id },
+      relations: ['coach'],
+    });
+
+    if (!training) throw new NotFoundException('Тренировка не найдена');
+    if (training.coach.id !== coachId)
+      throw new ForbiddenException('Нельзя редактировать чужую тренировку');
+
+    Object.assign(training, dto);
+    return this.trainingRepo.save(training);
+  }
+  async delete(id: number, coachId: number) {
+    const training = await this.trainingRepo.findOne({
+      where: { id },
+      relations: ['coach'],
+    });
+
+    if (!training) throw new NotFoundException('Тренировка не найдена');
+    if (training.coach.id !== coachId)
+      throw new ForbiddenException('Нельзя удалить чужую тренировку');
+
+    await this.trainingRepo.remove(training);
   }
 }
