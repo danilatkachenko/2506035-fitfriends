@@ -142,4 +142,32 @@ export class TrainingService {
     Object.assign(training, dto);
     return this.trainingRepo.save(training);
   }
+  async findTrainings(filters: {
+    duration?: number;
+    price?: number;
+    calories?: number;
+    search?: string;
+  }) {
+    console.log('Фильтры:', filters);
+    const query = this.trainingRepo.createQueryBuilder('training')
+        .leftJoinAndSelect('training.coach', 'coach');
+
+    if (filters.duration) {
+      query.andWhere('training.duration = :duration', { duration: filters.duration });
+    }
+    if (filters.price) {
+      query.andWhere('training.price <= :price', { price: filters.price });
+    }
+    if (filters.calories) {
+      query.andWhere('training.calories <= :calories', { calories: filters.calories });
+    }
+    if (filters.search) {
+      query.andWhere('(training.title ILIKE :search OR training.description ILIKE :search)', {
+        search: `%${filters.search}%`,
+      });
+    }
+
+    return query.getMany();
+  }
+
 }

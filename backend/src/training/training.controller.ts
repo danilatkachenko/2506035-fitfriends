@@ -27,14 +27,6 @@ export class TrainingController {
     const userId = req.user.id;
     return this.trainingService.createTraining(userId, dto);
   }
-  @Get()
-  async getAll(
-    @Query('minPrice') minPrice?: number,
-    @Query('maxPrice') maxPrice?: number,
-    @Query('sort') sort?: 'price' | 'duration',
-  ) {
-    return this.trainingService.getAll({ minPrice, maxPrice, sort });
-  }
   @Get(':id')
   async getById(@Param('id') id: number) {
     return this.trainingService.getById(id);
@@ -75,5 +67,15 @@ export class TrainingController {
       ...rest,
       coach: safeCoach,
     };
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getTrainings(
+      @Query('duration') duration?: number,
+      @Query('price') price?: number,
+      @Query('calories') calories?: number,
+      @Query('search') search?: string,
+  ) {
+    return this.trainingService.findTrainings({ duration, price, calories, search });
   }
 }
