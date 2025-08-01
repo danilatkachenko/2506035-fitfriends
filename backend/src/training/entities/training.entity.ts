@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
@@ -33,4 +34,7 @@ export class TrainingEntity {
 
   @OneToMany(() => CommentEntity, (comment) => comment.training)
   comments: CommentEntity[];
+
+  @CreateDateColumn()
+  createdAt: Date;
 }
