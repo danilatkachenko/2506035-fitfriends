@@ -1,31 +1,36 @@
 import {
-    Column,
-    Entity,
-    ManyToOne,
-    PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from '../../user/user.entity';
+import { CommentEntity } from '../../comment/comment.entity';
 
 @Entity('trainings')
 export class TrainingEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    title: string;
+  @Column()
+  title: string;
 
-    @Column({ type: 'text' })
-    description: string;
+  @Column({ type: 'text' })
+  description: string;
 
-    @Column()
-    duration: number; // в минутах
+  @Column()
+  duration: number; // в минутах
 
-    @Column({ default: 0 })
-    calories: number;
+  @Column({ default: 0 })
+  calories: number;
 
-    @Column({ default: 0 })
-    price: number;
+  @Column({ default: 0 })
+  price: number;
 
-    @ManyToOne(() => UserEntity, (user) => user.trainings)
-    coach: UserEntity;
+  @ManyToOne(() => UserEntity, (user) => user.trainings)
+  coach: UserEntity;
+
+  @OneToMany(() => CommentEntity, (comment) => comment.training)
+  comments: CommentEntity[];
 }

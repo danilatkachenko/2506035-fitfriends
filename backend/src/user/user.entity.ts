@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { TrainingEntity } from '../training/entities/training.entity';
+import { CommentEntity } from '../comment/comment.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -20,4 +21,7 @@ export class UserEntity {
 
   @OneToMany(() => TrainingEntity, (training) => training.coach)
   trainings: TrainingEntity[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.author)
+  comments: CommentEntity[];
 }
