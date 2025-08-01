@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CommentEntity } from './comment.entity';
@@ -39,5 +43,39 @@ export class CommentService {
       where: { training: { id: trainingId } },
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async delete(commentId: number, userId: number) {
+    const comment = await this.commentRepo.findOne({
+      where: { id: commentId },
+      relations: ['author'],
+    });
+
+    if (!comment) {
+      throw new NotFoundException('Комментарий не найден');
+    }
+
+    if (comment.author.id !== userId) {
+      throw new ForbiddenException('Вы не можете удалить чужой комментарий');
+    }
+
+    await this.commentRepo.remove(comment);
+  }
+
+  async deleteComment(commentId: number, userId: number) {
+    const comment = await this.commentRepo.findOne({
+      where: { id: commentId },
+      relations: ['author'],
+    });
+
+    if (!comment) {
+      throw new NotFoundException('Комментарий не найден');
+    }
+
+    if (comment.author.id !== userId) {
+      throw new ForbiddenException('Вы не можете удалить чужой комментарий');
+    }
+
+    await this.commentRepo.remove(comment);
   }
 }

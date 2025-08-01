@@ -7,6 +7,7 @@ import {
   UseGuards,
   Req,
   ParseIntPipe,
+  Delete,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -25,5 +26,12 @@ export class CommentController {
   @Get(':trainingId')
   findForTraining(@Param('trainingId', ParseIntPipe) trainingId: number) {
     return this.commentService.findForTraining(trainingId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async deleteComment(@Param('id', ParseIntPipe) id: number, @Req() req) {
+    await this.commentService.delete(id, req.user.id);
+    return { message: 'Комментарий удалён' };
   }
 }
