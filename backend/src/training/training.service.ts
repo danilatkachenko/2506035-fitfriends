@@ -142,32 +142,51 @@ export class TrainingService {
     Object.assign(training, dto);
     return this.trainingRepo.save(training);
   }
-  async findTrainings(filters: {
+  async findTrainings({
+    duration,
+    price,
+    calories,
+    search,
+    sortBy,
+    order,
+    limit,
+    page,
+  }: {
     duration?: number;
     price?: number;
     calories?: number;
     search?: string;
+    sortBy: 'price' | 'duration' | 'calories';
+    order: 'asc' | 'desc';
+    limit: number;
+    page: number;
   }) {
-    console.log('Фильтры:', filters);
-    const query = this.trainingRepo.createQueryBuilder('training')
-        .leftJoinAndSelect('training.coach', 'coach');
+    const qb = this.trainingRepo
+      .createQueryBuilder('training')
+      .leftJoinAndSelect('training.coach', 'coach');
 
-    if (filters.duration) {
-      query.andWhere('training.duration = :duration', { duration: filters.duration });
-    }
-    if (filters.price) {
-      query.andWhere('training.price <= :price', { price: filters.price });
-    }
-    if (filters.calories) {
-      query.andWhere('training.calories <= :calories', { calories: filters.calories });
-    }
-    if (filters.search) {
-      query.andWhere('(training.title ILIKE :search OR training.description ILIKE :search)', {
-        search: `%${filters.search}%`,
-      });
+    if (duration) qb.andWhere('training.duration = :duration', { duration });
+    if (price) qb.andWhere('training.price = :price', { price });
+    if (calories) qb.andWhere('training.calories = :calories', { calories });
+    if (search) {
+      qb.andWhere(
+        '(training.title ILIKE :search OR training.description ILIKE :search)',
+        { search: `%${search}%` },
+      );
     }
 
-    return query.getMany();
+    qb.orderBy(`training.${sortBy}`, order.toUpperCase() as 'ASC' | 'DESC')
+      .take(limit)
+      .skip((page - 1) * limit);
+
+    const [items, total] = await qb.getManyAndCount();
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+    };
   }
-
 }

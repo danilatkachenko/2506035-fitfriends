@@ -71,11 +71,24 @@ export class TrainingController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async getTrainings(
-      @Query('duration') duration?: number,
-      @Query('price') price?: number,
-      @Query('calories') calories?: number,
-      @Query('search') search?: string,
+    @Query('duration') duration?: number,
+    @Query('price') price?: number,
+    @Query('calories') calories?: number,
+    @Query('search') search?: string,
+    @Query('sortBy') sortBy: 'price' | 'duration' | 'calories' = 'price',
+    @Query('order') order: 'asc' | 'desc' = 'asc',
+    @Query('limit') limit = 10,
+    @Query('page') page = 1,
   ) {
-    return this.trainingService.findTrainings({ duration, price, calories, search });
+    return this.trainingService.findTrainings({
+      duration,
+      price,
+      calories,
+      search,
+      sortBy,
+      order,
+      limit: Number(limit),
+      page: Number(page),
+    });
   }
 }
