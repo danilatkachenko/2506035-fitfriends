@@ -58,29 +58,49 @@ export class TrainingService {
       },
     });
   }
-  async getAll(filters: FilterTrainingDto) {
-    const query = this.trainingRepo
+  async getAll(params: {
+    page?: number;
+    limit?: number;
+    sort?: string;
+    order?: 'ASC' | 'DESC';
+    coachId?: number;
+  }) {
+    const {
+      page = 1,
+      limit = 10,
+      sort = 'createdAt',
+      order = 'DESC',
+      coachId,
+    } = params;
+
+    const qb = this.trainingRepo
       .createQueryBuilder('training')
       .leftJoinAndSelect('training.coach', 'coach');
 
-    if (filters.minPrice !== undefined) {
-      query.andWhere('training.price >= :minPrice', {
-        minPrice: filters.minPrice,
-      });
+    if (coachId) {
+      qb.where('coach.id = :coachId', { coachId });
+    }
+    const allowedSortFields = ['price', 'duration', 'createdAt'];
+
+    if (sort && order && allowedSortFields.includes(sort)) {
+      qb.orderBy(`training.${sort}`, order);
     }
 
-    if (filters.maxPrice !== undefined) {
-      query.andWhere('training.price <= :maxPrice', {
-        maxPrice: filters.maxPrice,
-      });
-    }
+    qb.orderBy(`training.${sort}`, order)
+      .skip((page - 1) * limit)
+      .take(limit);
 
-    if (filters.sort) {
-      query.orderBy(`training.${filters.sort}`, 'ASC');
-    }
+    const [items, total] = await qb.getManyAndCount();
 
-    return query.getMany();
+    return {
+      items,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+    };
   }
+
   async getById(id: number) {
     const training = await this.trainingRepo.findOne({
       where: { id },
@@ -178,6 +198,46 @@ export class TrainingService {
     qb.orderBy(`training.${sortBy}`, order.toUpperCase() as 'ASC' | 'DESC')
       .take(limit)
       .skip((page - 1) * limit);
+
+    const [items, total] = await qb.getManyAndCount();
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+    };
+  }
+  async getAllPaginated(
+    userId: number,
+    role: 'client' | 'coach',
+    options: {
+      page?: number;
+      limit?: number;
+      sortBy?: 'price' | 'duration';
+      order?: 'ASC' | 'DESC';
+    },
+  ) {
+    const { page = 1, limit = 5, sortBy = 'price', order = 'ASC' } = options;
+
+    const qb = this.trainingRepo
+      .createQueryBuilder('training')
+      .leftJoinAndSelect('training.coach', 'coach');
+
+    //  Фильтрация по роли
+    if (role === 'coach') {
+      qb.where('coach.id = :userId', { userId });
+    } else if (role === 'client') {
+      qb.innerJoin('training.favorites', 'favorites').andWhere(
+        'favorites.user.id = :userId',
+        { userId },
+      );
+    }
+
+    qb.orderBy(`training.${sortBy}`, order)
+      .skip((page - 1) * limit)
+      .take(limit);
 
     const [items, total] = await qb.getManyAndCount();
 

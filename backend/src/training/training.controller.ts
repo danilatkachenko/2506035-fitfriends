@@ -27,10 +27,35 @@ export class TrainingController {
     const userId = req.user.id;
     return this.trainingService.createTraining(userId, dto);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('my')
+  async getMyTrainings(
+    @Req() req,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('sort') sort = 'createdAt',
+    @Query('order') order: 'ASC' | 'DESC' = 'DESC',
+  ) {
+    const coachId = req.user.id;
+
+    const parsedPage = parseInt(page ?? '1', 10);
+    const parsedLimit = parseInt(limit ?? '10', 10);
+
+    return this.trainingService.getAll({
+      page: parsedPage,
+      limit: parsedLimit,
+      sort,
+      order,
+      coachId,
+    });
+  }
+
   @Get(':id')
   async getById(@Param('id') id: number) {
     return this.trainingService.getById(id);
   }
+
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   async update(
@@ -41,12 +66,14 @@ export class TrainingController {
     const updated = await this.trainingService.update(id, req.user.id, dto);
     return updated;
   }
+
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id: number, @Req() req) {
     await this.trainingService.delete(id, req.user.id);
     return { message: 'Удалено' };
   }
+
   @UseGuards(JwtAuthGuard)
   @Put(':id')
   async updateTraining(
@@ -68,27 +95,21 @@ export class TrainingController {
       coach: safeCoach,
     };
   }
+
   @UseGuards(JwtAuthGuard)
   @Get()
   async getTrainings(
-    @Query('duration') duration?: number,
-    @Query('price') price?: number,
-    @Query('calories') calories?: number,
-    @Query('search') search?: string,
-    @Query('sortBy') sortBy: 'price' | 'duration' | 'calories' = 'price',
-    @Query('order') order: 'asc' | 'desc' = 'asc',
-    @Query('limit') limit = 10,
-    @Query('page') page = 1,
+    @Req() req,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('sort') sortBy?: 'price' | 'duration',
+    @Query('order') order?: 'ASC' | 'DESC',
   ) {
-    return this.trainingService.findTrainings({
-      duration,
-      price,
-      calories,
-      search,
+    return this.trainingService.getAllPaginated(req.user.id, req.user.role, {
+      page,
+      limit,
       sortBy,
       order,
-      limit: Number(limit),
-      page: Number(page),
     });
   }
 }
