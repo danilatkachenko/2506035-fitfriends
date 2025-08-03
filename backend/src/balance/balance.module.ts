@@ -12,5 +12,6 @@ import { TrainingEntity } from '../training/entities/training.entity';
   ],
   providers: [BalanceService],
   controllers: [BalanceController],
+  exports: [BalanceService],
 })
 export class BalanceModule {}

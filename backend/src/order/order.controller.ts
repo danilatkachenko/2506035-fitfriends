@@ -40,10 +40,10 @@ export class OrderController {
   // Обновить статус заказа (только коуч)
   @Put(':id/status')
   async updateOrderStatus(
-    @Param('id', ParseIntPipe) id: number,
-    @Req() req,
-    @Body() dto: UpdateOrderStatusDto,
+      @Param('id', ParseIntPipe) id: number,
+      @Req() req,
+      @Body() dto: UpdateOrderStatusDto,
   ) {
-    return this.orderService.updateOrderStatus(id, req.user.id, dto);
+    return this.orderService.updateOrderStatus(id, req.user.id, dto.status);
   }
 }

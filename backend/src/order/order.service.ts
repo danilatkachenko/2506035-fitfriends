@@ -10,6 +10,7 @@ import { TrainingEntity } from '../training/entities/training.entity';
 import { UserEntity } from '../user/user.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { BalanceService } from '../balance/balance.service';
 
 @Injectable()
 export class OrderService {
@@ -20,6 +21,7 @@ export class OrderService {
     private readonly trainingRepo: Repository<TrainingEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
+    private readonly balanceService: BalanceService,
   ) {}
 
   async createOrder(clientId: number, dto: CreateOrderDto) {
@@ -71,11 +73,11 @@ export class OrderService {
   async updateOrderStatus(
     orderId: number,
     coachId: number,
-    dto: UpdateOrderStatusDto,
+    status: 'pending' | 'accepted' | 'rejected',
   ) {
     const order = await this.orderRepo.findOne({
       where: { id: orderId },
-      relations: ['training', 'training.coach'],
+      relations: ['training', 'client', 'training.coach'],
     });
 
     if (!order) {
@@ -86,7 +88,17 @@ export class OrderService {
       throw new ForbiddenException('Вы не можете изменять этот заказ');
     }
 
-    order.status = dto.status;
-    return this.orderRepo.save(order);
+    order.status = status;
+    const savedOrder = await this.orderRepo.save(order);
+
+    // 🔹 Если заказ подтверждён — пополняем баланс
+    if (status === 'accepted') {
+      await this.balanceService.addToBalance(
+        order.client.id,
+        order.training.id,
+        order.quantity,
+      );
+    }
+    return savedOrder;
   }
 }
