@@ -8,6 +8,7 @@ import { CommentModule } from './comment/comment.module';
 import { FavoriteModule } from './favorite/favorite.module';
 import { OrderModule } from './order/order.module';
 import { BalanceModule } from './balance/balance.module';
+import { QuestionnaireModule } from './questionnaire/questionnaire.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { BalanceModule } from './balance/balance.module';
     FavoriteModule,
     OrderModule,
     BalanceModule,
+    QuestionnaireModule,
   ],
 })
 export class AppModule {}

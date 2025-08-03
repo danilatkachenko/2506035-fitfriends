@@ -1,8 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { TrainingEntity } from '../training/entities/training.entity';
 import { CommentEntity } from '../comment/comment.entity';
 import { FavoriteEntity } from '../favorite/favorite.entity';
 import { OrderEntity } from '../order/entities/order.entity';
+import { QuestionnaireEntity } from '../questionnaire/questionnaire.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -32,4 +39,7 @@ export class UserEntity {
 
   @OneToMany(() => OrderEntity, (order) => order.client)
   orders: OrderEntity[];
+
+  @OneToOne(() => QuestionnaireEntity, (questionnaire) => questionnaire.user)
+  questionnaire: QuestionnaireEntity;
 }
