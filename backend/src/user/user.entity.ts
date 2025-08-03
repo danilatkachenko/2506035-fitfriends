@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { TrainingEntity } from '../training/entities/training.entity';
 import { CommentEntity } from '../comment/comment.entity';
 import { FavoriteEntity } from '../favorite/favorite.entity';
+import { OrderEntity } from '../order/entities/order.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -28,4 +29,7 @@ export class UserEntity {
 
   @OneToMany(() => FavoriteEntity, (fav) => fav.user)
   favorites: FavoriteEntity[];
+
+  @OneToMany(() => OrderEntity, (order) => order.client)
+  orders: OrderEntity[];
 }
