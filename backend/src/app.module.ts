@@ -7,6 +7,7 @@ import { TrainingModule } from './training/training.module';
 import { CommentModule } from './comment/comment.module';
 import { FavoriteModule } from './favorite/favorite.module';
 import { OrderModule } from './order/order.module';
+import { BalanceModule } from './balance/balance.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { OrderModule } from './order/order.module';
     CommentModule,
     FavoriteModule,
     OrderModule,
+    BalanceModule,
   ],
 })
 export class AppModule {}
