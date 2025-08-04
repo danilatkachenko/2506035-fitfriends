@@ -10,6 +10,7 @@ import { OrderModule } from './order/order.module';
 import { BalanceModule } from './balance/balance.module';
 import { QuestionnaireModule } from './questionnaire/questionnaire.module';
 import { NotificationModule } from './notification/notification.module';
+import { FriendModule } from './friend/friend.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { NotificationModule } from './notification/notification.module';
     BalanceModule,
     QuestionnaireModule,
     NotificationModule,
+    FriendModule,
   ],
 })
 export class AppModule {}
