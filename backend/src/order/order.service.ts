@@ -9,19 +9,24 @@ import { OrderEntity } from './entities/order.entity';
 import { TrainingEntity } from '../training/entities/training.entity';
 import { UserEntity } from '../user/user.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { BalanceService } from '../balance/balance.service';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectRepository(OrderEntity)
     private readonly orderRepo: Repository<OrderEntity>,
+
     @InjectRepository(TrainingEntity)
     private readonly trainingRepo: Repository<TrainingEntity>,
+
     @InjectRepository(UserEntity)
     private readonly userRepo: Repository<UserEntity>,
+
     private readonly balanceService: BalanceService,
+
+    private readonly notificationService: NotificationService,
   ) {}
 
   async createOrder(clientId: number, dto: CreateOrderDto) {
@@ -56,17 +61,28 @@ export class OrderService {
       status: 'pending',
     });
 
-    return this.orderRepo.save(order);
+    const savedOrder = await this.orderRepo.save(order);
+
+    // Отправляем уведомление коучу
+    await this.notificationService.createNotification(
+      training.coach.id,
+      `У вас купили тренировку: ${training.title}`,
+    );
+
+    return savedOrder;
   }
 
-  async getMyOrders(userId: number) {
-    return this.orderRepo.find({ where: { client: { id: userId } } });
+  async getMyOrders(clientId: number) {
+    return this.orderRepo.find({
+      where: { client: { id: clientId } },
+      relations: ['client', 'training'],
+    });
   }
 
   async getOrdersForCoach(coachId: number) {
     return this.orderRepo.find({
       where: { training: { coach: { id: coachId } } },
-      relations: ['training', 'training.coach', 'client'],
+      relations: ['client', 'training'],
     });
   }
 
@@ -77,7 +93,7 @@ export class OrderService {
   ) {
     const order = await this.orderRepo.findOne({
       where: { id: orderId },
-      relations: ['training', 'client', 'training.coach'],
+      relations: ['training', 'training.coach', 'client'],
     });
 
     if (!order) {
@@ -89,9 +105,9 @@ export class OrderService {
     }
 
     order.status = status;
-    const savedOrder = await this.orderRepo.save(order);
+    await this.orderRepo.save(order);
 
-    // 🔹 Если заказ подтверждён — пополняем баланс
+    // Если заказ принят — добавляем баланс
     if (status === 'accepted') {
       await this.balanceService.addToBalance(
         order.client.id,
@@ -99,6 +115,13 @@ export class OrderService {
         order.quantity,
       );
     }
-    return savedOrder;
+
+    // Отправляем уведомление клиенту
+    await this.notificationService.createNotification(
+      order.client.id,
+      `Статус вашего заказа №${order.id} изменён на ${status}`,
+    );
+
+    return order;
   }
 }

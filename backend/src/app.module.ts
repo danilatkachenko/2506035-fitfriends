@@ -9,6 +9,7 @@ import { FavoriteModule } from './favorite/favorite.module';
 import { OrderModule } from './order/order.module';
 import { BalanceModule } from './balance/balance.module';
 import { QuestionnaireModule } from './questionnaire/questionnaire.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { QuestionnaireModule } from './questionnaire/questionnaire.module';
     OrderModule,
     BalanceModule,
     QuestionnaireModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}
