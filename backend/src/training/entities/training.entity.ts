@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from '../../user/user.entity';
 import { CommentEntity } from '../../comment/comment.entity';
+import { ReviewEntity } from '../../review/entities/review.entity';
 
 @Entity('trainings')
 export class TrainingEntity {
@@ -37,4 +38,7 @@ export class TrainingEntity {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @OneToMany(() => ReviewEntity, (review) => review.training, { cascade: true })
+  reviews: ReviewEntity[];
 }

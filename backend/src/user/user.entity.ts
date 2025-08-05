@@ -11,6 +11,7 @@ import { FavoriteEntity } from '../favorite/favorite.entity';
 import { OrderEntity } from '../order/entities/order.entity';
 import { QuestionnaireEntity } from '../questionnaire/questionnaire.entity';
 import { NotificationEntity } from '../notification/entities/notification.entity';
+import { ReviewEntity } from '../review/entities/review.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -46,4 +47,7 @@ export class UserEntity {
 
   @OneToMany(() => NotificationEntity, (notification) => notification.user)
   notifications: NotificationEntity[];
+
+  @OneToMany(() => ReviewEntity, (review) => review.user, { cascade: true })
+  reviews: ReviewEntity[];
 }

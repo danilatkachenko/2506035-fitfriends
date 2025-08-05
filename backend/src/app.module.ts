@@ -11,6 +11,7 @@ import { BalanceModule } from './balance/balance.module';
 import { QuestionnaireModule } from './questionnaire/questionnaire.module';
 import { NotificationModule } from './notification/notification.module';
 import { FriendModule } from './friend/friend.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { FriendModule } from './friend/friend.module';
     QuestionnaireModule,
     NotificationModule,
     FriendModule,
+    ReviewModule,
   ],
 })
 export class AppModule {}
