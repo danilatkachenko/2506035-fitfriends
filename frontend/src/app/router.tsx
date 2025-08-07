@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { ProtectedRoute } from '../components/ProtectedRoute';
 import IntroPage from '../pages/IntroPage.tsx';
 import SignInPage from '../pages/SignInPage.tsx';
 import SignUpPage from '../pages/SignUpPage.tsx';
@@ -37,78 +38,78 @@ export const router = createBrowserRouter([
   },
   {
     path: '/questionnaire-user',
-    element: <QuestionnaireUserPage />,
+    element: <ProtectedRoute><QuestionnaireUserPage /></ProtectedRoute>,
   },
   {
     path: '/questionnaire-coach',
-    element: <QuestionnaireCoachPage />,
+    element: <ProtectedRoute><QuestionnaireCoachPage /></ProtectedRoute>,
   },
   {
     path: '/training-catalog',
-    element: <TrainingCatalogPage />,
+    element: <ProtectedRoute><TrainingCatalogPage /></ProtectedRoute>,
   },
   {
     path: '/diary',
-    element: <TrainingDiaryPage />,
+    element: <ProtectedRoute><TrainingDiaryPage /></ProtectedRoute>,
   },
   {
     path: '/training',
-    element: <TrainingCardUserPage />,
+    element: <ProtectedRoute><TrainingCardUserPage /></ProtectedRoute>,
   },
   {
     path: '/user-coach',
-    element: <UserCardCoachPage />,
+    element: <ProtectedRoute><UserCardCoachPage /></ProtectedRoute>,
   },
   {
     path: '/user-coach-view',
-    element: <UserCardCoachWithoutButtonPage />,
+    element: <ProtectedRoute><UserCardCoachWithoutButtonPage /></ProtectedRoute>,
   },
   {
     path: '/user-user',
-    element: <UserCardUserPage />,
+    element: <ProtectedRoute><UserCardUserPage /></ProtectedRoute>,
   },
   {
     path: '/users',
-    element: <UsersCatalogPage />,
+    element: <ProtectedRoute><UsersCatalogPage /></ProtectedRoute>,
   },
   {
     path: '/training-card-coach',
-    element: <TrainingCardCoachPage />,
+    element: <ProtectedRoute><TrainingCardCoachPage /></ProtectedRoute>,
   },
   {
     path: '/account-coach',
-    element: <PersonalAccountCoachPage />,
+    element: <ProtectedRoute><PersonalAccountCoachPage /></ProtectedRoute>,
   },
   {
     path: '/account-user',
-    element: <PersonalAccountUserPage />,
+    element: <ProtectedRoute><PersonalAccountUserPage /></ProtectedRoute>,
   },
   {
     path: '/my-trainings',
-    element: <MyTrainingsPage />,
+    element: <ProtectedRoute><MyTrainingsPage /></ProtectedRoute>,
   },
   {
     path: '/my-purchases',
-    element: <MyPurchasesPage />,
+    element: <ProtectedRoute><MyPurchasesPage /></ProtectedRoute>,
   },
   {
     path: '/my-orders',
-    element: <MyOrdersPage />,
+    element: <ProtectedRoute><MyOrdersPage /></ProtectedRoute>,
   },
   {
     path: '/create-training',
-    element: <CreateTrainingPage />,
+    element: <ProtectedRoute><CreateTrainingPage /></ProtectedRoute>,
   },
   {
     path: '/home',
-    element: <HomePage />,
+    element: <ProtectedRoute><HomePage /></ProtectedRoute>,
   },
   {
     path: '/friends-coach',
-    element: <FriendsListCoachPage />,
+    element: <ProtectedRoute><FriendsListCoachPage /></ProtectedRoute>,
   },
   {
     path: '/friends-user',
-    element: <FriendsListUserPage />,
+    element: <ProtectedRoute><FriendsListUserPage /></ProtectedRoute>,
   }
 ]);

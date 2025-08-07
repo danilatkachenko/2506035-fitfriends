@@ -1,9 +1,31 @@
-import { FormEvent } from 'react';
+import { FormEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../api/auth-api';
 
 export default function SignInPage() {
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    // Тут потом добавим авторизацию
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (evt: FormEvent) => {
+    evt.preventDefault();
+    setError(null);
+
+    if (!email || !password) {
+      setError('Пожалуйста, заполните все поля');
+      return;
+    }
+
+    try {
+      const { accessToken } = await login(email, password);
+      localStorage.setItem('accessToken', accessToken);
+      navigate('/home');
+    } catch (err) {
+      setError('Неверный логин или пароль');
+      console.error(err); // Вывод ошибки для отладки
+    }
   };
 
   return (
@@ -30,7 +52,13 @@ export default function SignInPage() {
                       <label>
                         <span className="custom-input__label">E-mail</span>
                         <span className="custom-input__wrapper">
-                          <input type="email" name="email" />
+                          <input
+                            type="email"
+                            name="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                          />
                         </span>
                       </label>
                     </div>
@@ -38,10 +66,17 @@ export default function SignInPage() {
                       <label>
                         <span className="custom-input__label">Пароль</span>
                         <span className="custom-input__wrapper">
-                          <input type="password" name="password" />
+                          <input
+                            type="password"
+                            name="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                          />
                         </span>
                       </label>
                     </div>
+                    {error && <div className="sign-in__error">{error}</div>}
                     <button className="btn sign-in__button" type="submit">
                       Продолжить
                     </button>
