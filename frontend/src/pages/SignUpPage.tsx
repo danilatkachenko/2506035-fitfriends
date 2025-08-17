@@ -1,9 +1,52 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { LOCATIONS } from '../constants/locations';
 
 export default function SignUpPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    birthday: '',
+    location: '',
+    password: '',
+    sex: 'female',
+    role: 'coach'
+  });
+  const [location, setLocation] = useState('');
+
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+    name: '',
+    location: '',
+  });
+
   useEffect(() => {
     document.title = 'Регистрация — FitFriends';
   }, []);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('http://localhost:3000/api/users/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      if (!res.ok) {
+        throw new Error(`Ошибка ${res.status}`);
+      }
+      const data = await res.json();
+    } catch (err) {
+    }
+  };
 
   return (
     <div className="wrapper">
@@ -23,7 +66,7 @@ export default function SignUpPage() {
                 <h1 className="popup-form__title">Регистрация</h1>
               </div>
               <div className="popup-form__form">
-                <form method="get">
+                <form onSubmit={handleSubmit}>
                   <div className="sign-up">
                     <div className="sign-up__load-photo">
                       <div className="input-load-avatar">
@@ -48,7 +91,7 @@ export default function SignUpPage() {
                         <label>
                           <span className="custom-input__label">Имя</span>
                           <span className="custom-input__wrapper">
-                            <input type="text" name="name" />
+                            <input type="text" name="name" value={formData.name} onChange={handleChange}/>
                           </span>
                         </label>
                       </div>
@@ -56,7 +99,7 @@ export default function SignUpPage() {
                         <label>
                           <span className="custom-input__label">E-mail</span>
                           <span className="custom-input__wrapper">
-                            <input type="email" name="email" />
+                            <input type="email" name="email" value={formData.email} onChange={handleChange}/>
                           </span>
                         </label>
                       </div>
@@ -64,27 +107,35 @@ export default function SignUpPage() {
                         <label>
                           <span className="custom-input__label">Дата рождения</span>
                           <span className="custom-input__wrapper">
-                            <input type="date" name="birthday" max="2099-12-31" />
+                            <input type="date" name="birthday" value={formData.birthday} onChange={handleChange}
+                              max="2099-12-31"
+                            />
                           </span>
                         </label>
                       </div>
-                      <div className="custom-select custom-select--not-selected">
-                        <span className="custom-select__label">Ваша локация</span>
-                        <button className="custom-select__button" type="button" aria-label="Выберите одну из опций">
-                          <span className="custom-select__text"></span>
-                          <span className="custom-select__icon">
-                            <svg width="15" height="6" aria-hidden="true">
-                              <use xlinkHref="#arrow-down"></use>
-                            </svg>
-                          </span>
-                        </button>
-                        <ul className="custom-select__list" role="listbox"></ul>
+                      <div className="custom-input">
+                        <label>
+                          <span className="custom-input__label">Локация</span>
+                          <select
+                            value={form.location}
+                            onChange={(e) => setForm({...form, location: e.target.value})}
+                          >
+                            <option value="">Выберите локацию</option>
+                            {LOCATIONS.map((loc) => (
+                              <option key={loc} value={loc}>
+                                {loc}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
                       </div>
                       <div className="custom-input">
                         <label>
                           <span className="custom-input__label">Пароль</span>
                           <span className="custom-input__wrapper">
-                            <input type="password" name="password" autoComplete="off" />
+                            <input type="password" name="password" value={formData.password} onChange={handleChange}
+                              autoComplete="off"
+                            />
                           </span>
                         </label>
                       </div>
@@ -93,21 +144,27 @@ export default function SignUpPage() {
                         <div className="custom-toggle-radio custom-toggle-radio--big">
                           <div className="custom-toggle-radio__block">
                             <label>
-                              <input type="radio" name="sex" />
+                              <input type="radio" name="sex" value="male" checked={formData.sex === 'male'}
+                                onChange={handleChange}
+                              />
                               <span className="custom-toggle-radio__icon"></span>
                               <span className="custom-toggle-radio__label">Мужской</span>
                             </label>
                           </div>
                           <div className="custom-toggle-radio__block">
                             <label>
-                              <input type="radio" name="sex" defaultChecked />
+                              <input type="radio" name="sex" value="female" checked={formData.sex === 'female'}
+                                onChange={handleChange}
+                              />
                               <span className="custom-toggle-radio__icon"></span>
                               <span className="custom-toggle-radio__label">Женский</span>
                             </label>
                           </div>
                           <div className="custom-toggle-radio__block">
                             <label>
-                              <input type="radio" name="sex" />
+                              <input type="radio" name="sex" value="any" checked={formData.sex === 'any'}
+                                onChange={handleChange}
+                              />
                               <span className="custom-toggle-radio__icon"></span>
                               <span className="custom-toggle-radio__label">Неважно</span>
                             </label>
@@ -120,12 +177,8 @@ export default function SignUpPage() {
                       <div className="role-selector sign-up__role-selector">
                         <div className="role-btn">
                           <label>
-                            <input
-                              className="visually-hidden"
-                              type="radio"
-                              name="role"
-                              value="coach"
-                              defaultChecked
+                            <input className="visually-hidden" type="radio" name="role" value="coach"
+                              checked={formData.role === 'coach'} onChange={handleChange}
                             />
                             <span className="role-btn__icon">
                               <svg width="12" height="13" aria-hidden="true">
@@ -137,12 +190,7 @@ export default function SignUpPage() {
                         </div>
                         <div className="role-btn">
                           <label>
-                            <input
-                              className="visually-hidden"
-                              type="radio"
-                              name="role"
-                              value="sportsman"
-                            />
+                            <input className="visually-hidden" type="radio" name="role" value="sportsman" checked={formData.role === 'sportsman'} onChange={handleChange} />
                             <span className="role-btn__icon">
                               <svg width="12" height="13" aria-hidden="true">
                                 <use xlinkHref="#icon-weight"></use>
@@ -155,12 +203,7 @@ export default function SignUpPage() {
                     </div>
                     <div className="sign-up__checkbox">
                       <label>
-                        <input
-                          type="checkbox"
-                          value="user-agreement"
-                          name="user-agreement"
-                          defaultChecked
-                        />
+                        <input type="checkbox" name="user-agreement" defaultChecked />
                         <span className="sign-up__checkbox-icon">
                           <svg width="9" height="6" aria-hidden="true">
                             <use xlinkHref="#arrow-check"></use>
